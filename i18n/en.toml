@@ -1,0 +1,30 @@
+[older]
+other = "Older"
+[newer]
+other = "Newer"
+[read-more]
+other = "Read More"
+[search]
+other = "Search..."
+[powered-by]
+other = "Powered By"
+[theme]
+other = "Theme"
+[About]
+other = "About"
+[Tags]
+other = "Tags"
+[Blog]
+other = "Blog"
+[Projects]
+other = "Projects"
+[Search]
+other = "Search"
+[recents]
+other = "Recently I wrote about:"
+[ru]
+other = "🇷🇺 русском"
+[en]
+other = "🇬🇧 english"
+[available_in]
+other = "Читать на"

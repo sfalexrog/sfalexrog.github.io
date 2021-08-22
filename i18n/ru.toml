@@ -1,0 +1,30 @@
+[older]
+other = "Раньше"
+[newer]
+other = "Позже"
+[read-more]
+other = "Читать дальше"
+[search]
+other = "Поиск..."
+[powered-by]
+other = "Powered By"
+[theme]
+other = "Тема"
+[About]
+other = "Обо мне"
+[Tags]
+other = "Тэги"
+[Blog]
+other = "Блог"
+[Projects]
+other = "Проекты"
+[Search]
+other = "Поиск"
+[recents]
+other = "Недавно я писал о:"
+[ru]
+other = "🇷🇺 русском"
+[en]
+other = "🇬🇧 english"
+[available_in]
+other = "Read in"

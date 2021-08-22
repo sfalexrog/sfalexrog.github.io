@@ -1,0 +1,88 @@
+baseURL = "http://localhost:8000/"
+defaultContentLanguage = "en"
+theme = "harbor"
+
+[languages]
+  [languages.en]
+    title = "sfalexrog is me"
+  [languages.ru]
+    title = "sfalexrog - это я"
+[Author]
+  name = "@sfalexrog"
+
+[permalinks]
+	post = "/:year/:month/:day/:filename/"
+	page = "/:filename/"
+
+[outputs]
+    section = ["JSON", "HTML"]
+
+[[params.nav]]
+  identifier = "about"
+  name = "About"
+  icon = "fas fa-user fa-lg"
+#  url = "/about/"
+  weight = 3
+
+# There's no fun in reading a blog with zero entries
+#[[params.nav]]
+#  identifier = "tags"
+#  name = "Tags"
+#  icon = "fas fa-tag fa-lg"
+#  url = "/tags/"
+#  weight = 3
+#
+#[[params.nav]]
+#  identifier = "blog"
+#  name = "Blog"
+#  url = "/posts/"
+#  weight = 3
+#  icon = "fas fa-rss-square fa-lg"
+
+# Let's disable this for now
+#[[params.nav]]
+#  identifier = "projects"
+#  name = "Projects"
+#  icon = "fas fa-tools fa-lg"
+#  url = "/projects/"
+#  weight = 3
+
+#[[params.nav]]
+#  identifier = "search"
+#  name = "Search"
+#  icon = "fas fa-search fa-lg"
+#  url = "/search/"
+#  weight = 3
+
+[[params.social]]
+  name = "GitHub"
+  url = "https://github.com/sfalexrog"
+  icon = "fab fa-github"
+
+[[params.social]]
+  name = "LinkedIn"
+  url = "https://www.linkedin.com/in/alexey-rogachevskiy-b4762b197"
+  icon = "fab fa-linkedin"
+
+[[params.social]]
+  name = "Telegram"
+  url = "https://t.me/sfalexrog"
+  icon = "fab fa-telegram"
+
+[[params.social]]
+  name = "email"
+  url = "mailto:sfalexrog@gmail.com"
+  icon = "fas fa-envelope"
+
+[params]
+  mainSections = ["posts"]
+  favicon = "favicon.ico"
+
+  [params.logo]
+    url = "logo.png"
+    width = 50
+    height = 50
+    alt = "Logo"
+
+[markup.goldmark.renderer]
+  unsafe = true

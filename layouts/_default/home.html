@@ -1,0 +1,22 @@
+{{ define "main" }}
+  <div class="container" role="main">
+    <article class="article" class="blog-post">
+      {{ partial "toc.html" . }}
+
+    </article>
+    {{ if and (gt .WordCount 400) (.Param "backtotop") }}
+      {{ partial "backtotop.html" . }}
+      <button onclick="topFunction()" id="backtotopButton">
+        <em class="fa fa-angle-up"></em>
+      </button>
+    {{ end }}
+    <div class="posts-list">
+        <h2>{{ i18n "recents" }}</h2>
+        {{ $pag := .Paginate (where site.RegularPages "Type" "in" site.Params.mainSections) }}
+
+        {{ range .Paginator.Pages }}
+          {{ partial "preview.html" . }}
+        {{ end }}
+      </div>
+  </div>
+{{ end }}
