@@ -1,0 +1,133 @@
+<!doctype html><html lang>
+<head>
+<meta charset=utf-8>
+<title>VMware Modules and Secure Boot</title>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel=alternate type=application/rss+xml href=https://sfalexrog.me/index.xml title="sfalexrog is me">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="VMware Modules and Secure Boot">
+<meta name=twitter:description content="tl;dr If you, like me, did not disable Secure Boot on your PC prior to installing Ubuntu, and if you, like me, would like to use VMware Player/Workstation (I haven&rsquo;t tested the Workstation, so ymmv) on your system, do the following:
+  launch VMware Player and get the &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo; window;
+  press the &ldquo;build&rdquo; button, wait for the build to seemingly fail (it will direct you to the build log);">
+<link rel=stylesheet href=https://sfalexrog.me/fontawesome/css/all.min.css>
+<link id=dark-mode-theme rel=stylesheet href=https://sfalexrog.me/css/dark.css>
+<script>var darkTheme=document.getElementById('dark-mode-theme'),storedTheme=localStorage.getItem('dark-mode-storage');storedTheme==='dark'?darkTheme.disabled=!1:storedTheme==='light'&&(darkTheme.disabled=!0)</script>
+<script src=https://sfalexrog.me/js/main.bundle.js></script>
+<script src=https://sfalexrog.me/js/instantpage.min.js type=module defer></script>
+<meta name=generator content="Hugo 0.88.1">
+</head>
+<body>
+<header>
+<nav class=navbar>
+<div class=nav>
+<a href=https://sfalexrog.me/ class=nav-logo>
+<img src=https://sfalexrog.me/images/logo.png width=50 height=50 alt=Logo>
+</a>
+<ul class=nav-links>
+<li>
+<a href=/ id=About><em class="fas fa-user fa-lg"></em></a>
+<a href=/ id=About>About</a>
+</li>
+<li>
+<a href=/posts/ id=Blog><em class="fas fa-rss-square fa-lg"></em></a>
+<a href=/posts/ id=Blog>Blog</a>
+</li>
+<ul class="pl0 mr3">
+Читать на
+<li class="list f5 f4-ns fw4 dib pr3">
+<a class="hover-white no-underline white-90" href=/ru/posts/vmware-modules-secure-boot/>🇷🇺 русском</a>
+</li>
+</ul>
+</ul>
+</div>
+</nav>
+<div class=intro-header>
+<div class=container>
+<div class=posts-heading>
+<h1>
+</h1>
+</div>
+</div>
+</div>
+</header>
+<div class=container role=main>
+<article class=article class=blog-post>
+<h2 id=tldr>tl;dr</h2>
+<p>If you, like me, did not disable Secure Boot on your PC prior to installing Ubuntu, and if you, like me, would like to use <a href=https://www.vmware.com/products/workstation-player.html>VMware Player</a>/Workstation (I haven&rsquo;t tested the Workstation, so ymmv) on your system, do the following:</p>
+<ol>
+<li>
+<p>launch VMware Player and get the &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo; window;</p>
+</li>
+<li>
+<p>press the &ldquo;build&rdquo; button, wait for the build to seemingly fail (it will direct you to the build log);</p>
+</li>
+<li>
+<p>observe that there&rsquo;s nothing terribly wrong with the build itself, just some warnings;</p>
+</li>
+<li>
+<p>try loading the modules yourself (and get &ldquo;Operation not permitted&rdquo; error) - <code>dmesg</code> will have the messages along the lines of <code>Lockdown: modprobe: unsigned module loading is restricted; see man kernel_lockdown.7</code>;</p>
+</li>
+<li>
+<p>navigate to <code>/var/lib/shim-signed/mok</code>, make sure there are two files there: <code>MOK.der</code> and <code>MOK.priv</code> (this is the important part, this is your Machine Owner Key on Ubuntu - it might be elsewhere on other systems);</p>
+</li>
+<li>
+<p>perform signing with the machine owner key:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmmon<span style=color:#66d9ef>)</span>
+$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmnet<span style=color:#66d9ef>)</span>
+</code></pre></div><p>(note that none of those commands will output anything);</p>
+</li>
+<li>
+<p>run VMware Player again, to make sure it is working now;</p>
+</li>
+<li>
+<p>reboot to have VMware add its network adapters (or fiddle with it yourself).</p>
+</li>
+</ol>
+<p>You have to have your kernel headers installed, but it&rsquo;s assumed you already have them (they&rsquo;re needed to build modules anyway).</p>
+<div class=blog-tags>
+<a href=https://sfalexrog.me/tags/vmware/>vmware</a>&nbsp;
+<a href=https://sfalexrog.me/tags/secure-boot/>secure-boot</a>&nbsp;
+</div>
+</article>
+</div>
+<footer>
+<div class=social-icons>
+<a href=https://github.com/sfalexrog name=GitHub>
+<em class="fab fa-github"></em>
+</a>
+&nbsp;&ndash;&nbsp;
+<a href=https://www.linkedin.com/in/alexey-rogachevskiy-b4762b197 name=LinkedIn>
+<em class="fab fa-linkedin"></em>
+</a>
+&nbsp;&ndash;&nbsp;
+<a href=https://t.me/sfalexrog name=Telegram>
+<em class="fab fa-telegram"></em>
+</a>
+&nbsp;&ndash;&nbsp;
+<a href=mailto:sfalexrog@gmail.com name=email>
+<em class="fas fa-envelope"></em>
+</a>
+</div>
+<p>
+<a href=https://sfalexrog.me/ru/posts/vmware-modules-secure-boot/></a>
+</p>
+<div class=container>
+<p class="credits copyright">
+<a href=https://sfalexrog.me/about>@sfalexrog</a>
+&nbsp;&copy;
+2021
+&nbsp;/&nbsp;
+<a href=https://sfalexrog.me/>sfalexrog is me</a>
+&nbsp;&ndash;&nbsp;
+<em class="fas fa-moon" id=dark-mode-toggle></em>
+</p>
+<p class="credits theme-by">
+Powered By <a href=https://gohugo.io>Hugo</a>&nbsp;
+Theme
+<a href=https://github.com/matsuyoshi30/harbor>Harbor</a>
+</p>
+</div>
+</footer>
+</body>
+</html>

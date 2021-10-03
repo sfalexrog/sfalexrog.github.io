@@ -13,7 +13,7 @@
 <script>var darkTheme=document.getElementById('dark-mode-theme'),storedTheme=localStorage.getItem('dark-mode-storage');storedTheme==='dark'?darkTheme.disabled=!1:storedTheme==='light'&&(darkTheme.disabled=!0)</script>
 <script src=https://sfalexrog.me/js/main.bundle.js></script>
 <script src=https://sfalexrog.me/js/instantpage.min.js type=module defer></script>
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 </head>
 <body>
 <header>
@@ -26,6 +26,10 @@
 <li>
 <a href=/ru/ id=About><em class="fas fa-user fa-lg"></em></a>
 <a href=/ru/ id=About>Обо мне</a>
+</li>
+<li>
+<a href=/ru/posts/ id=Blog><em class="fas fa-rss-square fa-lg"></em></a>
+<a href=/ru/posts/ id=Blog>Блог</a>
 </li>
 <ul class="pl0 mr3">
 Read in
@@ -69,6 +73,22 @@ Read in
 </article>
 <div class=posts-list>
 <h2>Недавно я писал о:</h2>
+<article class=post-preview>
+<a href=https://sfalexrog.me/ru/posts/vmware-modules-secure-boot/>
+<h2 class=post-title>Модули ядра VMware и Secure Boot</h2>
+</a>
+<div class=post-entry>
+<p>tl;dr Если вы, как и я, не отключали на своём компьютере Secure Boot перед установкой убунты, и если вы, как и я, хотите при этом использовать VMware Player/Workstation (дисклеймер: Workstation я не пробовал, смотрите сами, что там будет), сделайте следующее:
+запустите VMware Player и получите окошко &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo;;
+нажмите на кнопку &ldquo;build&rdquo;, подождите, пока сборка не окончится провалом (в появившемся окошке будет путь к логу);</p>
+<a href=https://sfalexrog.me/ru/posts/vmware-modules-secure-boot/ class=post-read-more>Читать дальше</a>
+</div>
+<div class=postmeta>
+<span class=meta-post>
+<em class="fa fa-calendar-alt"></em>&nbsp;Oct 3, 2021
+</span>
+</div>
+</article>
 </div>
 </div>
 <footer>
