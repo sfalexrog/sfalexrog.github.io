@@ -32,12 +32,12 @@ theme = "harbor"
 #  url = "/tags/"
 #  weight = 3
 #
-#[[params.nav]]
-#  identifier = "blog"
-#  name = "Blog"
-#  url = "/posts/"
-#  weight = 3
-#  icon = "fas fa-rss-square fa-lg"
+[[params.nav]]
+  identifier = "blog"
+  name = "Blog"
+  url = "/posts/"
+  weight = 3
+  icon = "fas fa-rss-square fa-lg"
 
 # Let's disable this for now
 #[[params.nav]]
