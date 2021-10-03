@@ -24,14 +24,13 @@ theme = "harbor"
 #  url = "/about/"
   weight = 3
 
-# There's no fun in reading a blog with zero entries
-#[[params.nav]]
-#  identifier = "tags"
-#  name = "Tags"
-#  icon = "fas fa-tag fa-lg"
-#  url = "/tags/"
-#  weight = 3
-#
+[[params.nav]]
+  identifier = "tags"
+  name = "Tags"
+  icon = "fas fa-tag fa-lg"
+  url = "/tags/"
+  weight = 3
+
 [[params.nav]]
   identifier = "blog"
   name = "Blog"
