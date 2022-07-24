@@ -1,137 +1,24 @@
-<!doctype html><html lang>
-<head>
-<meta charset=utf-8>
-<title>Модули ядра VMware и Secure Boot</title>
-<meta http-equiv=x-ua-compatible content="IE=edge">
-<meta name=viewport content="width=device-width,initial-scale=1">
-<link rel=alternate type=application/rss+xml href=https://sfalexrog.me/index.xml title="sfalexrog - это я">
-<meta name=twitter:card content="summary">
-<meta name=twitter:title content="Модули ядра VMware и Secure Boot">
-<meta name=twitter:description content="tl;dr Если вы, как и я, не отключали на своём компьютере Secure Boot перед установкой убунты, и если вы, как и я, хотите при этом использовать VMware Player/Workstation (дисклеймер: Workstation я не пробовал, смотрите сами, что там будет), сделайте следующее:
-  запустите VMware Player и получите окошко &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo;;
-  нажмите на кнопку &ldquo;build&rdquo;, подождите, пока сборка не окончится провалом (в появившемся окошке будет путь к логу);">
-<link rel=stylesheet href=https://sfalexrog.me/fontawesome/css/all.min.css>
-<link id=dark-mode-theme rel=stylesheet href=https://sfalexrog.me/css/dark.css>
-<script>var darkTheme=document.getElementById('dark-mode-theme'),storedTheme=localStorage.getItem('dark-mode-storage');storedTheme==='dark'?darkTheme.disabled=!1:storedTheme==='light'&&(darkTheme.disabled=!0)</script>
-<script src=https://sfalexrog.me/js/main.bundle.js></script>
-<script src=https://sfalexrog.me/js/instantpage.min.js type=module defer></script>
-<meta name=generator content="Hugo 0.88.1">
-</head>
-<body>
-<header>
-<nav class=navbar>
-<div class=nav>
-<a href=https://sfalexrog.me/ru/ class=nav-logo>
-<img src=https://sfalexrog.me/images/logo.png width=50 height=50 alt=Logo>
-</a>
-<ul class=nav-links>
-<li>
-<a href=/ru/ id=About><em class="fas fa-user fa-lg"></em></a>
-<a href=/ru/ id=About>Обо мне</a>
-</li>
-<li>
-<a href=/ru/tags/ id=Tags><em class="fas fa-tag fa-lg"></em></a>
-<a href=/ru/tags/ id=Tags>Тэги</a>
-</li>
-<li>
-<a href=/ru/posts/ id=Blog><em class="fas fa-rss-square fa-lg"></em></a>
-<a href=/ru/posts/ id=Blog>Блог</a>
-</li>
-<ul class="pl0 mr3">
-Read in
-<li class="list f5 f4-ns fw4 dib pr3">
-<a class="hover-white no-underline white-90" href=/posts/vmware-modules-secure-boot/>🇬🇧 english</a>
-</li>
-</ul>
-</ul>
-</div>
-</nav>
-<div class=intro-header>
-<div class=container>
-<div class=posts-heading>
-<h1>
-</h1>
-</div>
-</div>
-</div>
-</header>
-<div class=container role=main>
-<article class=article class=blog-post>
-<h2 id=tldr>tl;dr</h2>
-<p>Если вы, как и я, не отключали на своём компьютере Secure Boot перед установкой убунты, и если вы, как и я, хотите при этом использовать <a href=https://www.vmware.com/products/workstation-player.html>VMware Player</a>/Workstation (дисклеймер: Workstation я не пробовал, смотрите сами, что там будет), сделайте следующее:</p>
-<ol>
-<li>
-<p>запустите VMware Player и получите окошко &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo;;</p>
-</li>
-<li>
-<p>нажмите на кнопку &ldquo;build&rdquo;, подождите, пока сборка не окончится провалом (в появившемся окошке будет путь к логу);</p>
-</li>
-<li>
-<p>убедитесь, что в логе никаких ошибок сборки на самом деле нет (warning&rsquo;и будут, но это норма);</p>
-</li>
-<li>
-<p>попробуйте самостоятельно загрузить модули <code>vmmon</code> и <code>vmnet</code> (и полюбуйтесь на ошибку &ldquo;Operation not permitted&rdquo;) - при этом в <code>dmesg</code> будут сообщения вроде <code>Lockdown: modprobe: unsigned module loading is restricted; see man kernel_lockdown.7</code>;</p>
-</li>
-<li>
-<p>посмотрите содержимое директории <code>/var/lib/shim-signed/mok</code>, в ней должны быть файлы <code>MOK.der</code> и <code>MOK.priv</code> (так в убунтах по умолчанию хранится Machine Owner Key - сертификат+ключ для подписи пользовательских модулей ядра - на других системах эти файлы могут лежать где-то ещё);</p>
-</li>
-<li>
-<p>подпишите собранные модули этим ключом:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmmon<span style=color:#66d9ef>)</span>
-$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmnet<span style=color:#66d9ef>)</span>
-</code></pre></div><p>(эти команды ничего не выведут в случае успеха);</p>
-</li>
-<li>
-<p>ещё раз запустите VMware Player, убедитесь, что он работает;</p>
-</li>
-<li>
-<p>перезагрузитесь для того, чтобы скрипты VMware настроили свои виртуальные сетевые адаптеры.</p>
-</li>
-</ol>
-<p>При этом нужно, чтобы заголовочные файлы текущего ядра были установлены, но они в любом случае нужны для сборки модулей.</p>
-<div class=blog-tags>
-<a href=https://sfalexrog.me/ru/tags/vmware/>vmware</a>&nbsp;
-<a href=https://sfalexrog.me/ru/tags/secure-boot/>secure-boot</a>&nbsp;
-</div>
-</article>
-</div>
-<footer>
-<div class=social-icons>
-<a href=https://github.com/sfalexrog name=GitHub>
-<em class="fab fa-github"></em>
-</a>
+<!doctype html><html lang><head><meta charset=utf-8><title>Модули ядра VMware и Secure Boot</title><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel=alternate type=application/rss+xml href=https://sfalexrog.github.io/index.xml title="sfalexrog - это я"><meta name=twitter:card content="summary"><meta name=twitter:title content="Модули ядра VMware и Secure Boot"><meta name=twitter:description content="tl;dr Если вы, как и я, не отключали на своём компьютере Secure Boot перед установкой убунты, и если вы, как и я, хотите при этом использовать VMware Player/Workstation (дисклеймер: Workstation я не пробовал, смотрите сами, что там будет), сделайте следующее:
+запустите VMware Player и получите окошко &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo;;
+нажмите на кнопку &ldquo;build&rdquo;, подождите, пока сборка не окончится провалом (в появившемся окошке будет путь к логу);"><link rel=stylesheet href=https://sfalexrog.github.io/fontawesome/css/all.min.css><link id=dark-mode-theme rel=stylesheet href=https://sfalexrog.github.io/css/dark.css><script>var darkTheme=document.getElementById("dark-mode-theme"),storedTheme=localStorage.getItem("dark-mode-storage");storedTheme==="dark"?darkTheme.disabled=!1:storedTheme==="light"&&(darkTheme.disabled=!0)</script><script src=https://sfalexrog.github.io/js/main.bundle.js></script>
+<script src=https://sfalexrog.github.io/js/instantpage.min.js type=module defer></script><meta name=generator content="Hugo 0.101.0"></head><body><header><nav class=navbar><div class=nav><a href=https://sfalexrog.github.io/ru/ class=nav-logo><img src=https://sfalexrog.github.io/images/logo.png width=50 height=50 alt=Logo></a><ul class=nav-links><li><a href=/ru/ id=About><em class="fas fa-user fa-lg"></em></a>
+<a href=/ru/ id=About>Обо мне</a></li><li><a href=/ru/tags/ id=Tags><em class="fas fa-tag fa-lg"></em></a>
+<a href=/ru/tags/ id=Tags>Тэги</a></li><li><a href=/ru/posts/ id=Blog><em class="fas fa-rss-square fa-lg"></em></a>
+<a href=/ru/posts/ id=Blog>Блог</a></li><ul class="pl0 mr3">Read in<li class="list f5 f4-ns fw4 dib pr3"><a class="hover-white no-underline white-90" href=/posts/vmware-modules-secure-boot/>🇬🇧 english</a></li></ul></ul></div></nav><div class=intro-header><div class=container><div class=posts-heading><h1></h1></div></div></div></header><div class=container role=main><article class=article class=blog-post><h2 id=tldr>tl;dr</h2><p>Если вы, как и я, не отключали на своём компьютере Secure Boot перед установкой убунты, и если вы, как и я, хотите при этом использовать <a href=https://www.vmware.com/products/workstation-player.html>VMware Player</a>/Workstation (дисклеймер: Workstation я не пробовал, смотрите сами, что там будет), сделайте следующее:</p><ol><li><p>запустите VMware Player и получите окошко &ldquo;Before you can run VMware several modules must be compiled and loaded into the running kernel&rdquo;;</p></li><li><p>нажмите на кнопку &ldquo;build&rdquo;, подождите, пока сборка не окончится провалом (в появившемся окошке будет путь к логу);</p></li><li><p>убедитесь, что в логе никаких ошибок сборки на самом деле нет (warning&rsquo;и будут, но это норма);</p></li><li><p>попробуйте самостоятельно загрузить модули <code>vmmon</code> и <code>vmnet</code> (и полюбуйтесь на ошибку &ldquo;Operation not permitted&rdquo;) - при этом в <code>dmesg</code> будут сообщения вроде <code>Lockdown: modprobe: unsigned module loading is restricted; see man kernel_lockdown.7</code>;</p></li><li><p>посмотрите содержимое директории <code>/var/lib/shim-signed/mok</code>, в ней должны быть файлы <code>MOK.der</code> и <code>MOK.priv</code> (так в убунтах по умолчанию хранится Machine Owner Key - сертификат+ключ для подписи пользовательских модулей ядра - на других системах эти файлы могут лежать где-то ещё);</p></li><li><p>подпишите собранные модули этим ключом:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmmon<span style=color:#66d9ef>)</span>
+</span></span><span style=display:flex><span>$ sudo /usr/src/linux-headers-<span style=color:#66d9ef>$(</span>uname -r<span style=color:#66d9ef>)</span>/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der <span style=color:#66d9ef>$(</span>modinfo -n vmnet<span style=color:#66d9ef>)</span>
+</span></span></code></pre></div><p>(эти команды ничего не выведут в случае успеха);</p></li><li><p>ещё раз запустите VMware Player, убедитесь, что он работает;</p></li><li><p>перезагрузитесь для того, чтобы скрипты VMware настроили свои виртуальные сетевые адаптеры.</p></li></ol><p>При этом нужно, чтобы заголовочные файлы текущего ядра были установлены, но они в любом случае нужны для сборки модулей.</p><div class=blog-tags><a href=https://sfalexrog.github.io/ru/tags/vmware/>vmware</a>&nbsp;
+<a href=https://sfalexrog.github.io/ru/tags/secure-boot/>secure-boot</a>&nbsp;</div></article></div><footer><div class=social-icons><a href=https://github.com/sfalexrog name=GitHub><em class="fab fa-github"></em></a>
 &nbsp;&ndash;&nbsp;
-<a href=https://www.linkedin.com/in/alexey-rogachevskiy-b4762b197 name=LinkedIn>
-<em class="fab fa-linkedin"></em>
-</a>
+<a href=https://www.linkedin.com/in/alexey-rogachevskiy-b4762b197 name=LinkedIn><em class="fab fa-linkedin"></em></a>
 &nbsp;&ndash;&nbsp;
-<a href=https://t.me/sfalexrog name=Telegram>
-<em class="fab fa-telegram"></em>
-</a>
+<a href=https://t.me/sfalexrog name=Telegram><em class="fab fa-telegram"></em></a>
 &nbsp;&ndash;&nbsp;
-<a href=mailto:sfalexrog@gmail.com name=email>
-<em class="fas fa-envelope"></em>
-</a>
-</div>
-<p>
-<a href=https://sfalexrog.me/posts/vmware-modules-secure-boot/></a>
-</p>
-<div class=container>
-<p class="credits copyright">
-<a href=https://sfalexrog.me/ru/about>@sfalexrog</a>
+<a href=mailto:sfalexrog@gmail.com name=email><em class="fas fa-envelope"></em></a></div><p><a href=https://sfalexrog.github.io/posts/vmware-modules-secure-boot/></a></p><div class=container><p class="credits copyright"><a href=https://sfalexrog.github.io/ru/about>@sfalexrog</a>
 &nbsp;&copy;
 2021
 &nbsp;/&nbsp;
-<a href=https://sfalexrog.me/ru/>sfalexrog - это я</a>
+<a href=https://sfalexrog.github.io/ru/>sfalexrog - это я</a>
 &nbsp;&ndash;&nbsp;
-<em class="fas fa-moon" id=dark-mode-toggle></em>
-</p>
-<p class="credits theme-by">
-Powered By <a href=https://gohugo.io>Hugo</a>&nbsp;
+<em class="fas fa-moon" id=dark-mode-toggle></em></p><p class="credits theme-by">Powered By <a href=https://gohugo.io>Hugo</a>&nbsp;
 Тема
-<a href=https://github.com/matsuyoshi30/harbor>Harbor</a>
-</p>
-</div>
-</footer>
-</body>
-</html>
+<a href=https://github.com/matsuyoshi30/harbor>Harbor</a></p></div></footer></body></html>
